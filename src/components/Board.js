@@ -4,19 +4,43 @@ import Square from './Square';
 class Board extends Component {
     constructor(props) {
         super(props);
-        this.state = { squares: Array(9).fill(null) };
+        this.state = { squares: Array(9).fill(null), xisNext: true  };
     }
     renderSquare(i) {
         return <Square value={this.state.squares[i]} handleClick={ () => {this.handleClick(i)}}/>
     }
+
     handleClick(i) {
-        console.log('printing i ... ', i);
         const squares = this.state.squares.slice();
-        squares[i] = 'X';
+        squares[i] = this.state.xisNext ? 'X' : 'O';
+        this.setState({xisNext: !this.state.xisNext});
         this.setState({squares});
     }
+
+    calculateWinner(squares) {
+        const lines = [
+          [0, 1, 2],
+          [3, 4, 5],
+          [6, 7, 8],
+          [0, 3, 6],
+          [1, 4, 7],
+          [2, 5, 8],
+          [0, 4, 8],
+          [2, 4, 6],
+        ];
+        for (let i = 0; i < lines.length; i++) {
+          const [a, b, c] = lines[i];
+          if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+            return squares[a];
+          }
+        }
+        return null;
+      }
+
     render() {
-        const status = 'Next player X';
+        console.log('test ', this.calculateWinner(this.state.squares));
+        const winner = this.calculateWinner(this.state.squares);
+        const status = winner ? (`Winner is ${this.calculateWinner(this.state.squares)}`) : ('Next player is ' + (this.state.xisNext ? 'X' : 'O'));
         return (
             <div>
                 <div className="status"> { status }</div>
